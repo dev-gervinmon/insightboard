@@ -11,7 +11,7 @@ import {
 const SalesByRegionChart = ({ data = [] }) => {
   if (!data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-[500px] text-slate-500">
+      <div className="flex items-center justify-center h-125 text-slate-500">
         No data available
       </div>
     );
