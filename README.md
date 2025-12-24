@@ -1,26 +1,84 @@
 # InsightBoard
 
-A full-stack dashboard application for visualizing sales metrics and analytics.
+A modern, production-ready SaaS analytics dashboard for visualizing sales metrics and insights. Built with FastAPI and React, featuring a polished UI, responsive design, and clean architecture.
 
 ## Tech Stack
 
-- **Backend**: FastAPI (Python)
-- **Frontend**: React + Vite + Recharts
+- **Backend**: FastAPI (Python) - REST API with error handling
+- **Frontend**: React 19 + Vite + Tailwind CSS v4 + Recharts
+- **Styling**: Tailwind CSS with modern gradients and animations
 - **Database**: CSV (easily upgradeable to PostgreSQL/MongoDB)
+
+## Key Features
+
+✨ **Modern UI/UX**
+
+- SaaS-ready design with indigo/blue color scheme
+- Responsive grid layouts (mobile, tablet, desktop)
+- Smooth animations and transitions
+- Professional cards with hover effects
+- Sticky navigation header
+
+📊 **Analytics Dashboard**
+
+- KPI summary cards with gradient accents
+- Sales by region bar chart
+- Sales over time line chart
+- Quick date presets (7, 30, 90 days)
+- Loading and error states
+
+🏗️ **Clean Architecture**
+
+- Custom React hooks for data fetching
+- Separated concerns with component composition
+- Reusable UI components
+- Type-safe API client
+- Proper error handling
 
 ## Project Structure
 
 ```
 insightboard/
-├── backend/           # FastAPI server
-│   ├── main.py       # App entry point
-│   ├── requirements.txt
-│   ├── routes/       # API routes
-│   └── data/         # Data files
-├── frontend/         # React application
-│   ├── src/          # React components
-│   ├── package.json
-│   └── vite.config.js
+├── backend/
+│   ├── main.py                 # FastAPI app entry point
+│   ├── requirements.txt         # Python dependencies
+│   ├── routes/
+│   │   ├── __init__.py
+│   │   └── metrics.py          # Metrics endpoints
+│   ├── services/
+│   │   └── sales_service.py    # Business logic
+│   ├── models/
+│   │   └── sales.py            # Pydantic models
+│   └── data/
+│       └── sales.csv           # Sample data
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx             # Main app component
+│   │   ├── main.jsx            # Entry point
+│   │   ├── index.css           # Global styles
+│   │   ├── components/
+│   │   │   ├── common/         # Shared components
+│   │   │   │   ├── Layout.jsx
+│   │   │   │   ├── Card.jsx
+│   │   │   │   ├── Filters.jsx
+│   │   │   │   ├── ErrorAlert.jsx
+│   │   │   │   └── LoadingSpinner.jsx
+│   │   │   ├── charts/         # Chart components
+│   │   │   │   ├── SalesByRegionChart.jsx
+│   │   │   │   └── SalesOverTimeChart.jsx
+│   │   │   ├── kpi/            # KPI components
+│   │   │   │   ├── KPICard.jsx
+│   │   │   │   └── KPISummary.jsx
+│   │   │   └── DashboardContent.jsx
+│   │   ├── hooks/
+│   │   │   └── useSalesMetrics.js    # Custom data hook
+│   │   └── services/
+│   │       └── api.js          # API client
+│   ├── tailwind.config.js      # Tailwind configuration
+│   ├── postcss.config.js       # PostCSS configuration
+│   ├── vite.config.js          # Vite configuration
+│   ├── package.json            # npm dependencies
+│   └── index.html              # HTML template
 └── README.md
 ```
 
