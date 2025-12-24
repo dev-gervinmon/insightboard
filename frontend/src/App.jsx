@@ -1,61 +1,75 @@
 import { useEffect, useState } from "react";
-import SalesByRegionChart from "./components/SalesByRegionChart";
-import SalesOverTimeChart from "./components/SalesOverTimeChart";
-import { get_sales_by_region, get_sales_over_time_daily } from "./services/api";
 import KPISummary from "./components/kpi/KPISummary";
+import { getSalesByRegion, getSalesOverTimeDaily } from "./services/api";
+import { DateFilters } from "./components/common/Filters";
+import { Layout } from "./components/common/Layout";
+import { Card } from "./components/common/Card";
+import SalesByRegionChart from "./components/charts/SalesByRegionChart";
+import SalesOverTimeChart from "./components/charts/SalesOverTimeChart";
 
 function App() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [salesData, setSalesData] = useState([]);
   const [salesOverTimeData, setSalesOverTimeData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const salesData = await get_sales_by_region(startDate, endDate);
-      const salesOverTimeData = await get_sales_over_time_daily(
-        startDate,
-        endDate
-      );
-      setSalesData(salesData);
-      setSalesOverTimeData(salesOverTimeData);
+      setIsLoading(true);
+      setError(null);
+      try {
+        const [sales, salesTime] = await Promise.all([
+          getSalesByRegion(startDate, endDate),
+          getSalesOverTimeDaily(startDate, endDate),
+        ]);
+        setSalesData(sales);
+        setSalesOverTimeData(salesTime);
+      } catch (err) {
+        setError("Failed to load data. Please try again.");
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchData();
   }, [startDate, endDate]);
 
   return (
-    <div
-      style={{
-        padding: "2rem",
-        display: "flex",
-        flexDirection: "column",
-        gap: "2rem",
-      }}
-    >
-      <h1>InsightBoard Frontend</h1>
-      <input
-        type="date"
-        value={startDate}
-        onChange={(e) => setStartDate(e.target.value)}
+    <Layout>
+      <DateFilters
+        startDate={startDate}
+        endDate={endDate}
+        onStartDateChange={setStartDate}
+        onEndDateChange={setEndDate}
       />
-      <input
-        type="date"
-        value={endDate}
-        onChange={(e) => setEndDate(e.target.value)}
-      />
-      <KPISummary startDate={startDate} endDate={endDate} />
 
-      <SalesByRegionChart
-        startDate={startDate}
-        endDate={endDate}
-        data={salesData}
-      />
-      <SalesOverTimeChart
-        startDate={startDate}
-        endDate={endDate}
-        data={salesOverTimeData}
-      />
-    </div>
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-red-800">
+          {error}
+        </div>
+      )}
+
+      {isLoading ? (
+        <div className="text-center py-12">
+          <p className="text-slate-600">Loading...</p>
+        </div>
+      ) : (
+        <>
+          <KPISummary startDate={startDate} endDate={endDate} />
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            <Card title="Sales by Region">
+              <SalesByRegionChart data={salesData} />
+            </Card>
+            <Card title="Sales Over Time">
+              <SalesOverTimeChart data={salesOverTimeData} />
+            </Card>
+          </div>
+        </>
+      )}
+    </Layout>
   );
 }
 
