@@ -1,30 +1,58 @@
-const transformSalesData = (data) => {
-  return Object.entries(data).map(([region, amount]) => ({
-    region,
-    amount,
-  }));
+const API_BASE_URL = "http://127.0.0.1:8000/api/v1";
+const REQUEST_TIMEOUT = 10000; // 10 seconds
+
+const fetchAPI = async (endpoint, params = {}) => {
+  try {
+    const url = new URL(`${API_BASE_URL}/${endpoint}`);
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) url.searchParams.append(key, value);
+    });
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+    const response = await fetch(url.toString(), {
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching ${endpoint}:`, error.message);
+    throw error;
+  }
 };
 
-export const get_sales_by_region = async (start_date, end_date) => {
-  const response = await fetch(
-    `http://127.0.0.1:8000/api/v1/metrics/sales-by-region?start_date=${start_date}&end_date=${end_date}`
-  );
-  const data = await response.json();
-  return transformSalesData(data);
+export const getSalesByRegion = async (startDate, endDate) => {
+  return fetchAPI("metrics/sales-by-region", {
+    start_date: startDate,
+    end_date: endDate,
+  });
 };
 
-export const get_sales_over_time_daily = async (start_date, end_date) => {
-  const response = await fetch(
-    `http://127.0.0.1:8000/api/v1/metrics/sales-over-time/daily?start_date=${start_date}&end_date=${end_date}`
-  );
-  const data = await response.json();
-  return data;
+export const getSalesOverTimeDaily = async (startDate, endDate) => {
+  return fetchAPI("metrics/sales-over-time/daily", {
+    start_date: startDate,
+    end_date: endDate,
+  });
 };
 
-export const get_summary_metrics = async (start_date, end_date) => {
-  const response = await fetch(
-    `http://127.0.0.1:8000/api/v1/metrics/summary?start_date=${start_date}&end_date=${end_date}`
-  );
-  const data = await response.json();
-  return data;
+export const getSalesOverTimeMonthly = async (startDate, endDate) => {
+  return fetchAPI("metrics/sales-over-time/monthly", {
+    start_date: startDate,
+    end_date: endDate,
+  });
+};
+
+export const getSummaryMetrics = async (startDate, endDate) => {
+  return fetchAPI("metrics/summary", {
+    start_date: startDate,
+    end_date: endDate,
+  });
 };
