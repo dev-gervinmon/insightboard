@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import SalesByRegionChart from "./components/SalesByRegionChart";
 import SalesOverTimeChart from "./components/SalesOverTimeChart";
 import { get_sales_by_region, get_sales_over_time_daily } from "./services/api";
+import KPISummary from "./components/kpi/KPISummary";
 
 function App() {
   const [startDate, setStartDate] = useState("");
@@ -42,6 +43,8 @@ function App() {
         value={endDate}
         onChange={(e) => setEndDate(e.target.value)}
       />
+      <KPISummary startDate={startDate} endDate={endDate} />
+
       <SalesByRegionChart
         startDate={startDate}
         endDate={endDate}
