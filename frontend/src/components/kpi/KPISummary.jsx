@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { get_summary_metrics } from "../../services/api";
+import { getSummaryMetrics } from "../../services/api";
 import KPICard from "./KPICard";
 
 const KPISummary = ({ startDate, endDate, data }) => {
@@ -7,7 +7,7 @@ const KPISummary = ({ startDate, endDate, data }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await get_summary_metrics(startDate, endDate);
+      const data = await getSummaryMetrics(startDate, endDate);
       setSummary(data);
     };
     fetchData();
