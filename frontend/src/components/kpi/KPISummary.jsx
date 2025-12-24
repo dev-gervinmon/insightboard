@@ -2,22 +2,50 @@ import { useEffect, useState } from "react";
 import { getSummaryMetrics } from "../../services/api";
 import KPICard from "./KPICard";
 
-const KPISummary = ({ startDate, endDate, data }) => {
-  const [summary, setSummary] = useState(data || {});
+const KPISummary = ({ startDate, endDate }) => {
+  const [summary, setSummary] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getSummaryMetrics(startDate, endDate);
-      setSummary(data);
+    const fetchSummary = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const data = await getSummaryMetrics(startDate, endDate);
+        setSummary(data);
+      } catch (err) {
+        setError("Failed to load summary metrics");
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    fetchData();
-  }, [startDate, endDate, data]);
+
+    fetchSummary();
+  }, [startDate, endDate]);
+
+  if (isLoading) {
+    return <div className="text-slate-600">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-600">{error}</div>;
+  }
+
+  if (!summary) {
+    return null;
+  }
 
   return (
-    <div style={{ display: "flex", gap: "20px" }}>
-      {Object.entries(summary).map(([key, value]) => (
-        <KPICard key={key} title={key} value={value} />
-      ))}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <KPICard title="total_revenue" value={summary.total_revenue} />
+      <KPICard title="total_orders" value={summary.total_orders} />
+      <KPICard title="top_region" value={summary.top_region || "N/A"} />
+      <KPICard
+        title="average_daily_sales"
+        value={summary.average_daily_sales}
+      />
     </div>
   );
 };
