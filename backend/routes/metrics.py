@@ -1,47 +1,29 @@
 from fastapi import APIRouter
-import pandas as pd
+from models.sales import SalesByRegion, DailySales, SalesSummary
+from services.sales_service import (
+    load_sales_data,
+    filter_sales_data,
+    get_sales_by_region_data,
+    get_daily_sales_data,
+    get_sales_summary_data,
+)
 
 router = APIRouter(prefix="/metrics", tags=["metrics"])
 
-@router.get("/sales-by-region")
-def get_sales_by_region(start_date: str | None = None, end_date: str | None = None):
-    df = pd.read_csv("data/sales.csv", parse_dates=["date"])
-    
-    if start_date:
-        df = df[df["date"] >= pd.to_datetime(start_date)]
-    if end_date:
-        df = df[df["date"] <= pd.to_datetime(end_date)]
+@router.get("/sales-by-region", response_model=list[SalesByRegion])
+def get_sales_by_region(start_date: str | None = None, end_date: str | None = None) -> list[SalesByRegion]:
+    df = load_sales_data()
+    df = filter_sales_data(df, start_date, end_date)
+    return get_sales_by_region_data(df)
 
-    sales_by_region = (df.groupby("region")["amount"].sum().to_dict())
-    return sales_by_region
+@router.get("/sales-over-time/daily", response_model=list[DailySales])
+def get_sales_over_time_daily(start_date: str | None = None, end_date: str | None = None) -> list[DailySales]:
+    df = load_sales_data()
+    df = filter_sales_data(df, start_date, end_date)
+    return get_daily_sales_data(df)
 
-@router.get("/sales-over-time/daily")
-def get_sales_over_time_daily(start_date: str | None = None, end_date: str | None = None):
-    df = pd.read_csv("data/sales.csv", parse_dates=["date"])
-    
-    if start_date:
-        df = df[df["date"] >= pd.to_datetime(start_date)]
-    if end_date:
-        df = df[df["date"] <= pd.to_datetime(end_date)]
-
-    daily_sales = df.groupby(df["date"].dt.date)["amount"].sum().reset_index().to_dict(orient="records")
-    return daily_sales
-
-@router.get("/summary")
-def get_sales_summary(start_date: str | None = None, end_date: str | None = None):
-    df = pd.read_csv("data/sales.csv", parse_dates=["date"])
-
-    if start_date:
-        df = df[df["date"] >= pd.to_datetime(start_date)]
-    if end_date:
-        df = df[df["date"] <= pd.to_datetime(end_date)]
-
-
-    summary = {
-        "total_revenue": float(df["amount"].sum()) if not df.empty else 0,
-        "total_orders": int(len(df)),
-        "top_region": df.groupby("region")["amount"].sum().idxmax() if not df.empty else None,
-        "average_daily_sales": float(df.groupby(df["date"].dt.date)["amount"].sum().mean()) if not df.empty else 0,
-    }
-    
-    return summary
+@router.get("/summary", response_model=SalesSummary)
+def get_sales_summary(start_date: str | None = None, end_date: str | None = None) -> SalesSummary:
+    df = load_sales_data()
+    df = filter_sales_data(df, start_date, end_date)
+    return get_sales_summary_data(df)
