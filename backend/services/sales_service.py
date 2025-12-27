@@ -1,22 +1,9 @@
 from typing import Optional
-from fastapi import HTTPException
 import pandas as pd
+from data.loader import SalesDataError
 from models.sales import SalesByRegion, DailySales, SalesSummary, TotalRevenue
 
-# Custom exception for business logic errors
-class SalesDataError(Exception):
-    pass
 
-def load_sales_data() -> pd.DataFrame:
-    """Load sales data from CSV file (later change into a database)."""
-    try:
-        df = pd.read_csv("data/sales.csv", parse_dates=["date"])
-        return df
-    except FileNotFoundError:
-        raise HTTPException(status_code=404, detail="Sales data file not found")
-    except Exception as e:
-        raise SalesDataError(f"Failed to load sales data: {e}")
-    
 def revenue_change_summary(
     df: pd.DataFrame, filtered_df: pd.DataFrame, start_date: Optional[str], end_date: Optional[str]
 ) -> TotalRevenue:
