@@ -36,7 +36,6 @@ def revenue_change_summary(
         change_percentage=change_percentage
     )
 
-
 def filter_sales_data(
     df: pd.DataFrame, start_date: Optional[pd.Timestamp], end_date: Optional[pd.Timestamp]
 ) -> pd.DataFrame:
