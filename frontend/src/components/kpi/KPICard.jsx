@@ -1,10 +1,12 @@
 const KPICard = ({ title, value }) => {
-  const formatTitle = (snakeCase) => {
-    return snakeCase
-      .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ");
-  };
+  const revenueChange = {};
+
+  if (typeof value === "object") {
+    revenueChange.current = value.current;
+    revenueChange.previous = value.previous;
+    revenueChange.percentage = value.change_percentage;
+    value = value.current;
+  }
 
   const formatCurrency = (value) => {
     if (typeof value !== "number") return value;
@@ -41,12 +43,27 @@ const KPICard = ({ title, value }) => {
     <div className="bg-white rounded-xl shadow-sm border border-slate-200/60 hover:shadow-lg hover:border-slate-300 transition-all p-6">
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-slate-500 mb-2">
-            {formatTitle(title)}
-          </p>
+          <p className="text-sm font-medium text-slate-500 mb-2">{title}</p>
           <p className="text-3xl font-bold text-slate-900">
             {formatCurrency(value)}
           </p>
+          {typeof revenueChange.percentage === "number" && (
+            <p
+              className={`mt-1 text-sm font-medium ${
+                revenueChange.percentage >= 0
+                  ? "text-green-600!"
+                  : "text-red-600!"
+              }`}
+            >
+              {revenueChange.percentage >= 0 ? "▲" : "▼"}{" "}
+              {Math.abs(revenueChange.percentage).toFixed(2)}%
+            </p>
+          )}
+          {typeof revenueChange.previous === "number" && (
+            <p className="mt-1 text-sm text-slate-400!">
+              (Previous: {formatCurrency(revenueChange.previous)})
+            </p>
+          )}
         </div>
         <div
           className={`w-12 h-12 rounded-lg bg-linear-to-br ${getGradient(
