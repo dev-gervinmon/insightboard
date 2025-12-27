@@ -37,15 +37,15 @@ def revenue_change_summary(
     )
 
 def filter_sales_data(
-    df: pd.DataFrame, start_date: Optional[pd.Timestamp], end_date: Optional[pd.Timestamp]
+    df: pd.DataFrame, start_date: Optional[str], end_date: Optional[str]
 ) -> pd.DataFrame:
     """Filter sales data by date range."""
     if start_date is not None and end_date is not None and start_date > end_date:
         raise SalesDataError("start_date cannot be after end_date.")
     if start_date is not None:
-        df = df[df["date"] >= start_date]
+        df = df[df["date"] >= pd.to_datetime(start_date)]
     if end_date is not None:
-        df = df[df["date"] <= end_date]
+        df = df[df["date"] <= pd.to_datetime(end_date)]
     return df
 
 def get_sales_by_region_data(df: pd.DataFrame) -> list[SalesByRegion]:
