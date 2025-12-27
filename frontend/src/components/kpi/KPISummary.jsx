@@ -39,11 +39,11 @@ const KPISummary = ({ startDate, endDate }) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <KPICard title="total_revenue" value={summary.total_revenue} />
-      <KPICard title="total_orders" value={summary.total_orders} />
-      <KPICard title="top_region" value={summary.top_region || "N/A"} />
+      <KPICard title="Total Revenue" value={summary.total_revenue} />
+      <KPICard title="Total Orders" value={summary.total_orders} />
+      <KPICard title="Top Region" value={summary.top_region || "N/A"} />
       <KPICard
-        title="average_daily_sales"
+        title="Average Daily Sales"
         value={summary.average_daily_sales}
       />
     </div>
